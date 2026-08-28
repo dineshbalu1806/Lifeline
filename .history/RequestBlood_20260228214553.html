@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Blood - Blood Bank Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px 30px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        label .required {
+            color: #e53935;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #e53935;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 25px;
+            margin-top: 10px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .radio-item label {
+            margin-bottom: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin-bottom: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+            color: #1565c0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .urgent-banner {
+            background: #f8d7da;
+            border-left: 4px solid #e53935;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+            color: #721c24;
+        }
+
+        .error-message {
+            color: #c62828;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        input.error,
+        select.error,
+        textarea.error {
+            border-color: #c62828;
+            background: #fef5f5;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #e53935;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #c62828;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 57, 53, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #757575;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #616161;
+        }
+
+        .success-panel {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .success-panel .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #4caf50;
+            color: white;
+            font-size: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: scaleIn 0.5s;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .success-panel h2 {
+            color: #4caf50;
+            margin-bottom: 15px;
+        }
+
+        .success-panel p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .request-id {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+
+        .request-id strong {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🩸 Request Blood</h1>
+            <p>Submit your urgent blood requirement request</p>
+        </div>
+
+        <div class="form-container">
+            <div class="alert" id="alertBox"></div>
+
+            <!-- Form Section -->
+            <div id="requestForm" style="display: block;">
+                <div class="info-box">
+                    ℹ️ Please fill in all the details below. Our system will match your requirement with available donors in your area.
+                </div>
+
+                <form id="bloodRequestForm">
+                    <!-- Requester Information -->
+                    <h3 style="color: #333; margin-bottom: 20px; font-size: 18px;">👤 Requester Information</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name <span class="required">*</span></label>
+                            <input type="text" id="requesterName" placeholder="Enter your full name" required>
+                            <div class="error-message" id="requesterNameError">Please enter your full name</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="requesterPhone" placeholder="+1 234 567 8900" required>
+                            <div class="error-message" id="requesterPhoneError">Please enter a valid phone number</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="requesterEmail" placeholder="your.email@example.com">
+                            <div class="error-message" id="requesterEmailError">Please enter a valid email address</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Relationship to Patient</label>
+                            <select id="relationship">
+                                <option value="">Select relationship</option>
+                                <option value="self">Self</option>
+                                <option value="family">Family Member</option>
+                                <option value="friend">Friend</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Patient Information -->
+                    <h3 style="color: #333; margin-bottom: 20px; margin-top: 30px; font-size: 18px;">🏥 Patient Information</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Patient Name <span class="required">*</span></label>
+                            <input type="text" id="patientName" placeholder="Enter patient's name" required>
+                            <div class="error-message" id="patientNameError">Please enter patient name</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Patient Age <span class="required">*</span></label>
+                            <input type="number" id="patientAge" placeholder="Age in years" min="0" max="120" required>
+                            <div class="error-message" id="patientAgeError">Please enter valid age</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Blood Group Required <span class="required">*</span></label>
+                            <select id="bloodGroup" required>
+                                <option value="">Select Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="Any">Any Blood Group</option>
+                            </select>
+                            <div class="error-message" id="bloodGroupError">Please select blood group</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Units Required <span class="required">*</span></label>
+                            <input type="number" id="unitsRequired" placeholder="Number of units (e.g., 2)" min="1" required>
+                            <div class="error-message" id="unitsError">Please enter number of units</div>
+                        </div>
+                    </div>
+
+                    <!-- Blood Request Details -->
+                    <h3 style="color: #333; margin-bottom: 20px; margin-top: 30px; font-size: 18px;">📋 Blood Request Details</h3>
+
+                    <div class="form-group">
+                        <label>Reason for Blood Request <span class="required">*</span></label>
+                        <select id="requestReason" required>
+                            <option value="">Select reason</option>
+                            <option value="accident">Accident/Injury</option>
+                            <option value="surgery">Scheduled Surgery</option>
+                            <option value="emergency_surgery">Emergency Surgery</option>
+                            <option value="cancer">Cancer Treatment</option>
+                            <option value="anemia">Anemia</option>
+                            <option value="bleeding_disorder">Bleeding Disorder</option>
+                            <option value="child_birth">Child Birth Complications</option>
+                            <option value="organ_transplant">Organ Transplant</option>
+                            <option value="other">Other Medical Condition</option>
+                        </select>
+                        <div class="error-message" id="reasonError">Please select a reason</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Medical Information</label>
+                        <textarea id="medicalInfo" placeholder="Describe the patient's medical condition and any special requirements..."></textarea>
+                    </div>
+
+                    <!-- Hospital & Location -->
+                    <h3 style="color: #333; margin-bottom: 20px; margin-top: 30px; font-size: 18px;">🏨 Hospital & Location</h3>
+
+                    <div class="form-group">
+                        <label>Hospital/Medical Center Name <span class="required">*</span></label>
+                        <input type="text" id="hospitalName" placeholder="Name of hospital or medical center" required>
+                        <div class="error-message" id="hospitalError">Please enter hospital name</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>City/Location <span class="required">*</span></label>
+                            <input type="text" id="location" placeholder="City or area" required>
+                            <div class="error-message" id="locationError">Please enter location</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ward/Department <span class="required">*</span></label>
+                            <input type="text" id="wardDepartment" placeholder="Ward or department name" required>
+                            <div class="error-message" id="wardError">Please enter ward/department</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Complete Hospital Address <span class="required">*</span></label>
+                        <textarea id="hospitalAddress" placeholder="Full address with landmark details" required></textarea>
+                        <div class="error-message" id="addressError">Please enter hospital address</div>
+                    </div>
+
+                    <!-- Emergency Status -->
+                    <h3 style="color: #333; margin-bottom: 20px; margin-top: 30px; font-size: 18px;">🚨 Emergency Status</h3>
+
+                    <div class="form-group">
+                        <label>Is this an Emergency? <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="emergencyYes" name="emergency" value="yes" onchange="toggleUrgencyMessage()">
+                                <label for="emergencyYes">Yes - Urgent</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="emergencyNo" name="emergency" value="no" onchange="toggleUrgencyMessage()">
+                                <label for="emergencyNo">No - Planned</label>
+                            </div>
+                        </div>
+                        <div class="error-message" id="emergencyError">Please select emergency status</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>When is the blood needed? <span class="required">*</span></label>
+                        <select id="bloodNeededBy" required>
+                            <option value="">Select timeframe</option>
+                            <option value="immediate">Immediate (Within hours)</option>
+                            <option value="24hours">Within 24 hours</option>
+                            <option value="2days">Within 2 days</option>
+                            <option value="week">Within a week</option>
+                        </select>
+                        <div class="error-message" id="timeframeError">Please select timeframe</div>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <h3 style="color: #333; margin-bottom: 20px; margin-top: 30px; font-size: 18px;">📞 Contact Information</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Hospital Contact Number <span class="required">*</span></label>
+                            <input type="tel" id="hospitalPhone" placeholder="Hospital phone" required>
+                            <div class="error-message" id="hospitalPhoneError">Please enter hospital phone</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Doctor's Name</label>
+                            <input type="text" id="doctorName" placeholder="Attending doctor's name">
+                        </div>
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <div class="form-group" style="margin-top: 30px;">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms" style="margin-bottom: 0;">
+                                I confirm that all information provided is accurate and true. <span class="required">*</span>
+                            </label>
+                        </div>
+                        <div class="error-message" id="termsError">You must confirm the information is accurate</div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="window.location.href='Home.html'">Back to Home</button>
+                        <button type="submit" class="btn-primary">Submit Blood Request</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Success Section -->
+            <div id="successSection" style="display: none;">
+                <div class="success-panel">
+                    <div class="checkmark">✓</div>
+                    <h2>Request Submitted Successfully!</h2>
+                    <p>Your blood request has been registered. We matched nearby donors and sent email notifications.</p>
+                    
+                    <div class="request-id">
+                        <strong>Request ID:</strong>
+                        <span id="requestID"></span>
+                    </div>
+
+                    <div id="urgentWarning" style="display: none; background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin: 20px 0; color: #721c24;">
+                        ⚠️ <strong>Urgent Request Marked:</strong> Request prioritized. Donors in your area were notified immediately.
+                    </div>
+
+                    <div id="notifiedDonors" style="background: #f5f5f5; border-radius: 8px; padding: 15px; text-align: left; color: #333;"></div>
+
+                    <p style="color: #666; font-size: 14px; margin: 20px 0;">
+                        <strong>Reference:</strong> Save your request ID for updates.<br>
+                        <strong>Status:</strong> When a donor accepts, other invites close automatically.
+                    </p>
+
+                    <button type="button" class="btn-primary" onclick="window.location.href='Home.html'" style="background: #4caf50; margin-top: 20px;">Back to Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="bloodRequestAPI.js"></script>
+    <script>
+        function toggleUrgencyMessage() {
+            const isEmergency = document.getElementById('emergencyYes').checked;
+            const bloodNeededSelect = document.getElementById('bloodNeededBy');
+            
+            if (isEmergency) {
+                bloodNeededSelect.value = 'immediate';
+                bloodNeededSelect.disabled = true;
+            } else {
+                bloodNeededSelect.disabled = false;
+            }
+        }
+
+        let currentRequestID = null;
+
+        function generateRequestID() {
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substr(2, 9).toUpperCase();
+            return `BR-${random}-${timestamp}`;
+        }
+
+        function bloodCompatible(requested, donorGroup) {
+            if (requested === 'Any') return true;
+            if (requested === donorGroup) return true;
+            // Simple compatibility: O- universal donor, O+ for positive types
+            if (donorGroup === 'O-') return true;
+            if (donorGroup === 'O+' && ['O+','A+','B+','AB+'].includes(requested)) return true;
+            return false;
+        }
+
+        function matchDonors(requestData) {
+            const donorsList = JSON.parse(localStorage.getItem('donorsList') || '[]');
+            const requestedGroup = requestData.bloodGroup;
+            const reqLocation = (requestData.location || '').toLowerCase();
+            const reqWard = (requestData.wardDepartment || '').toLowerCase();
+            
+            const matches = donorsList.filter(donor => {
+                const donorGroup = donor.personalInfo?.bloodGroup;
+                if (!bloodCompatible(requestedGroup, donorGroup)) return false;
+                const donorAddress = `${donor.personalInfo?.address || ''} ${donor.personalInfo?.ward || ''}`.toLowerCase();
+                const locMatch = donorAddress.includes(reqLocation) || donorAddress.includes(reqWard);
+                return locMatch;
+            }).map(donor => ({
+                name: donor.personalInfo.fullName,
+                email: donor.personalInfo.email,
+                phone: donor.personalInfo.phone,
+                bloodGroup: donor.personalInfo.bloodGroup,
+                ward: donor.personalInfo.ward,
+                status: 'Notified'
+            }));
+
+            return matches;
+        }
+
+        function renderNotifiedDonors(requestData) {
+            const container = document.getElementById('notifiedDonors');
+            const donors = requestData.matchedDonors || [];
+
+            if (!donors.length) {
+                container.innerHTML = '<strong>No matching donors found in this area.</strong>';
+                return;
+            }
+
+            const acceptedBy = requestData.acceptedBy;
+            container.innerHTML = `
+                <strong>Notified Donors (${donors.length}):</strong>
+                <ul style="margin-top: 10px; list-style: none; padding: 0;">
+                    ${donors.map(d => `
+                        <li style="padding: 8px 0; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                            <div>
+                                <div style="font-weight: 600;">${d.name} (${d.bloodGroup})</div>
+                                <div style="font-size: 13px; color: #555;">${d.email} • ${d.phone} • Ward: ${d.ward || 'N/A'}</div>
+                            </div>
+                            <div>
+                                <span style="background: ${d.status === 'Accepted' ? '#d4edda' : d.status === 'Closed' ? '#f8d7da' : '#fff3cd'}; color: ${d.status === 'Accepted' ? '#155724' : d.status === 'Closed' ? '#721c24' : '#856404'}; padding: 6px 10px; border-radius: 6px; font-size: 12px;">${d.status}</span>
+                                ${!acceptedBy ? `<button style="margin-left: 10px; padding: 6px 10px; border: none; border-radius: 6px; background: #4caf50; color: white; cursor: pointer;" onclick="acceptDonation('${requestData.requestID}','${d.email}')">Mark Accepted</button>` : ''}
+                            </div>
+                        </li>
+                    `).join('')}
+                </ul>
+                <div style="margin-top: 10px; font-size: 13px; color: #555;">Email notifications sent. First acceptance will lock the request; others will close automatically.</div>
+            `;
+        }
+
+        function acceptDonation(requestID, donorEmail) {
+            const allRequests = JSON.parse(localStorage.getItem('bloodRequests') || '[]');
+            const reqIdx = allRequests.findIndex(r => r.requestID === requestID);
+            if (reqIdx === -1) return;
+
+            const request = allRequests[reqIdx];
+            if (request.acceptedBy) return; // Already accepted
+
+            request.acceptedBy = donorEmail;
+            request.status = 'Accepted';
+            request.matchedDonors = (request.matchedDonors || []).map(d => {
+                if (d.email === donorEmail) {
+                    return { ...d, status: 'Accepted' };
+                }
+                return { ...d, status: 'Closed' };
+            });
+
+            allRequests[reqIdx] = request;
+            localStorage.setItem('bloodRequests', JSON.stringify(allRequests));
+
+            renderNotifiedDonors(request);
+            showAlert('Donation accepted. Other invites closed.', 'success');
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert show ${type}`;
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 4000);
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            // Requester info
+            const requesterName = document.getElementById('requesterName');
+            if (requesterName.value.trim().length < 3) {
+                requesterName.classList.add('error');
+                document.getElementById('requesterNameError').classList.add('show');
+                isValid = false;
+            } else {
+                requesterName.classList.remove('error');
+                document.getElementById('requesterNameError').classList.remove('show');
+            }
+
+            const requesterPhone = document.getElementById('requesterPhone');
+            if (requesterPhone.value.trim().length < 10) {
+                requesterPhone.classList.add('error');
+                document.getElementById('requesterPhoneError').classList.add('show');
+                isValid = false;
+            } else {
+                requesterPhone.classList.remove('error');
+                document.getElementById('requesterPhoneError').classList.remove('show');
+            }
+
+            // Patient info
+            const patientName = document.getElementById('patientName');
+            if (patientName.value.trim().length < 3) {
+                patientName.classList.add('error');
+                document.getElementById('patientNameError').classList.add('show');
+                isValid = false;
+            } else {
+                patientName.classList.remove('error');
+                document.getElementById('patientNameError').classList.remove('show');
+            }
+
+            const patientAge = document.getElementById('patientAge');
+            if (patientAge.value === '' || patientAge.value < 0 || patientAge.value > 120) {
+                patientAge.classList.add('error');
+                document.getElementById('patientAgeError').classList.add('show');
+                isValid = false;
+            } else {
+                patientAge.classList.remove('error');
+                document.getElementById('patientAgeError').classList.remove('show');
+            }
+
+            // Blood requirements
+            const bloodGroup = document.getElementById('bloodGroup');
+            if (bloodGroup.value === '') {
+                bloodGroup.classList.add('error');
+                document.getElementById('bloodGroupError').classList.add('show');
+                isValid = false;
+            } else {
+                bloodGroup.classList.remove('error');
+                document.getElementById('bloodGroupError').classList.remove('show');
+            }
+
+            const unitsRequired = document.getElementById('unitsRequired');
+            if (unitsRequired.value === '' || unitsRequired.value < 1) {
+                unitsRequired.classList.add('error');
+                document.getElementById('unitsError').classList.add('show');
+                isValid = false;
+            } else {
+                unitsRequired.classList.remove('error');
+                document.getElementById('unitsError').classList.remove('show');
+            }
+
+            // Request reason
+            const requestReason = document.getElementById('requestReason');
+            if (requestReason.value === '') {
+                requestReason.classList.add('error');
+                document.getElementById('reasonError').classList.add('show');
+                isValid = false;
+            } else {
+                requestReason.classList.remove('error');
+                document.getElementById('reasonError').classList.remove('show');
+            }
+
+            // Hospital info
+            const hospitalName = document.getElementById('hospitalName');
+            if (hospitalName.value.trim().length < 3) {
+                hospitalName.classList.add('error');
+                document.getElementById('hospitalError').classList.add('show');
+                isValid = false;
+            } else {
+                hospitalName.classList.remove('error');
+                document.getElementById('hospitalError').classList.remove('show');
+            }
+
+            const location = document.getElementById('location');
+            if (location.value.trim() === '') {
+                location.classList.add('error');
+                document.getElementById('locationError').classList.add('show');
+                isValid = false;
+            } else {
+                location.classList.remove('error');
+                document.getElementById('locationError').classList.remove('show');
+            }
+
+            const wardDepartment = document.getElementById('wardDepartment');
+            if (wardDepartment.value.trim() === '') {
+                wardDepartment.classList.add('error');
+                document.getElementById('wardError').classList.add('show');
+                isValid = false;
+            } else {
+                wardDepartment.classList.remove('error');
+                document.getElementById('wardError').classList.remove('show');
+            }
+
+            const hospitalAddress = document.getElementById('hospitalAddress');
+            if (hospitalAddress.value.trim().length < 10) {
+                hospitalAddress.classList.add('error');
+                document.getElementById('addressError').classList.add('show');
+                isValid = false;
+            } else {
+                hospitalAddress.classList.remove('error');
+                document.getElementById('addressError').classList.remove('show');
+            }
+
+            // Emergency status
+            const emergency = document.querySelector('input[name="emergency"]:checked');
+            if (!emergency) {
+                document.getElementById('emergencyError').classList.add('show');
+                isValid = false;
+            } else {
+                document.getElementById('emergencyError').classList.remove('show');
+            }
+
+            // Timeframe
+            const bloodNeededBy = document.getElementById('bloodNeededBy');
+            if (bloodNeededBy.value === '') {
+                bloodNeededBy.classList.add('error');
+                document.getElementById('timeframeError').classList.add('show');
+                isValid = false;
+            } else {
+                bloodNeededBy.classList.remove('error');
+                document.getElementById('timeframeError').classList.remove('show');
+            }
+
+            // Hospital phone
+            const hospitalPhone = document.getElementById('hospitalPhone');
+            if (hospitalPhone.value.trim().length < 10) {
+                hospitalPhone.classList.add('error');
+                document.getElementById('hospitalPhoneError').classList.add('show');
+                isValid = false;
+            } else {
+                hospitalPhone.classList.remove('error');
+                document.getElementById('hospitalPhoneError').classList.remove('show');
+            }
+
+            // Terms
+            const terms = document.getElementById('terms');
+            if (!terms.checked) {
+                document.getElementById('termsError').classList.add('show');
+                isValid = false;
+            } else {
+                document.getElementById('termsError').classList.remove('show');
+            }
+
+            return isValid;
+        }
+
+        document.getElementById('bloodRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                showAlert('Please fill in all required fields correctly.', 'error');
+                return;
+            }
+
+            // Collect form data
+            const requestData = {
+                requestID: generateRequestID(),
+                requesterName: document.getElementById('requesterName').value,
+                requesterPhone: document.getElementById('requesterPhone').value,
+                requesterEmail: document.getElementById('requesterEmail').value,
+                relationship: document.getElementById('relationship').value,
+                patientName: document.getElementById('patientName').value,
+                patientAge: document.getElementById('patientAge').value,
+                bloodGroup: document.getElementById('bloodGroup').value,
+                unitsRequired: document.getElementById('unitsRequired').value,
+                reason: document.getElementById('requestReason').value,
+                medicalInfo: document.getElementById('medicalInfo').value,
+                hospitalName: document.getElementById('hospitalName').value,
+                location: document.getElementById('location').value,
+                wardDepartment: document.getElementById('wardDepartment').value,
+                hospitalAddress: document.getElementById('hospitalAddress').value,
+                emergency: document.querySelector('input[name="emergency"]:checked').value,
+                bloodNeededBy: document.getElementById('bloodNeededBy').value,
+                hospitalPhone: document.getElementById('hospitalPhone').value,
+                doctorName: document.getElementById('doctorName').value,
+                submittedAt: new Date().toLocaleString(),
+                status: 'Active',
+                matchedDonors: [],
+                acceptedBy: null
+            };
+
+            // Match donors and attach statuses
+            requestData.matchedDonors = matchDonors(requestData);
+
+            // Save to localStorage
+            const allRequests = JSON.parse(localStorage.getItem('bloodRequests') || '[]');
+            allRequests.push(requestData);
+            localStorage.setItem('bloodRequests', JSON.stringify(allRequests));
+
+            // Show success message
+            currentRequestID = requestData.requestID;
+            document.getElementById('requestForm').style.display = 'none';
+            document.getElementById('successSection').style.display = 'block';
+            document.getElementById('requestID').textContent = requestData.requestID;
+
+            if (requestData.emergency === 'yes') {
+                document.getElementById('urgentWarning').style.display = 'block';
+            }
+
+            renderNotifiedDonors(requestData);
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Clear error messages on input
+        document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea').forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.classList.contains('error')) {
+                    this.classList.remove('error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

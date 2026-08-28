@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Registration - Blood Bank Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: #f5f5f5;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 3px;
+            background: #ddd;
+            z-index: 0;
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            color: #666;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 5px;
+        }
+
+        .step.active .step-number {
+            background: #e53935;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #4caf50;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        label .required {
+            color: #e53935;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="password"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #e53935;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #e53935;
+            background: #fef5f5;
+        }
+
+        .upload-area.dragover {
+            border-color: #e53935;
+            background: #fef5f5;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .file-item .status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status.verifying {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.verified {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #e53935;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #c62828;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 57, 53, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #757575;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #616161;
+        }
+
+        .verification-panel {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .verification-panel h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .verification-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #e53935;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #c62828;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        input.error,
+        select.error,
+        textarea.error {
+            border-color: #c62828;
+        }
+
+        .success-panel {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-panel .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #4caf50;
+            color: white;
+            font-size: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: scaleIn 0.5s;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .info-box p {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🩸 Donor Registration</h1>
+            <p>Join us in saving lives through blood donation</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">Personal Info</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">Medical Info</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Documents</div>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-label">Verification</div>
+            </div>
+            <div class="step" data-step="5">
+                <div class="step-number">5</div>
+                <div class="step-label">Set Password</div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <!-- Step 1: Personal Information -->
+            <div class="form-step active" data-step="1">
+                <h2 style="margin-bottom: 25px; color: #333;">Personal Information</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <input type="text" id="fullName" placeholder="Enter your full name" required>
+                        <div class="error-message" id="fullNameError">Please enter your full name</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Blood Group <span class="required">*</span></label>
+                        <select id="bloodGroup" required>
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                        <div class="error-message" id="bloodGroupError">Please select your blood group</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" placeholder="+1 234 567 8900" pattern="[0-9+\-\s()]+" required>
+                        <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" placeholder="your.email@example.com" required>
+                        <div class="error-message" id="emailError">Please enter a valid email address</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Address <span class="required">*</span></label>
+                    <textarea id="address" placeholder="Enter your complete address" required></textarea>
+                    <div class="error-message" id="addressError">Please enter your address</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ward/District <span class="required">*</span></label>
+                        <input type="text" id="ward" placeholder="Enter your ward/district" required>
+                        <div class="error-message" id="wardError">Please enter your ward/district</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Date of Birth <span class="required">*</span></label>
+                        <input type="text" id="dob" placeholder="DD/MM/YYYY" required>
+                        <div class="error-message" id="dobError">Please enter your date of birth</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="male" name="gender" value="male">
+                            <label for="male" style="margin-bottom: 0;">Male</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="female" name="gender" value="female">
+                            <label for="female" style="margin-bottom: 0;">Female</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="other" name="gender" value="other">
+                            <label for="other" style="margin-bottom: 0;">Other</label>
+                        </div>
+                    </div>
+                    <div class="error-message" id="genderError">Please select your gender</div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-primary" onclick="nextStep(1)">Next: Medical Information →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Medical Information -->
+            <div class="form-step" data-step="2">
+                <h2 style="margin-bottom: 25px; color: #333;">Medical Information</h2>
+                
+                <div class="info-box">
+                    <p><strong>Important:</strong> Please provide accurate medical information. This helps ensure safe blood donation for both you and recipients.</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Weight (kg) <span class="required">*</span></label>
+                        <input type="text" id="weight" placeholder="Enter weight in kg" required>
+                        <div class="error-message" id="weightError">Weight must be at least 50kg</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Height (cm) <span class="required">*</span></label>
+                        <input type="text" id="height" placeholder="Enter height in cm" required>
+                        <div class="error-message" id="heightError">Please enter your height</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Do you have any of the following conditions? <span class="required">*</span></label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="diabetes" name="condition" value="diabetes">
+                            <label for="diabetes" style="margin-bottom: 0;">Diabetes</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hypertension" name="condition" value="hypertension">
+                            <label for="hypertension" style="margin-bottom: 0;">Hypertension/High Blood Pressure</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="heartDisease" name="condition" value="heartDisease">
+                            <label for="heartDisease" style="margin-bottom: 0;">Heart Disease</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hivAids" name="condition" value="hivAids">
+                            <label for="hivAids" style="margin-bottom: 0;">HIV/AIDS</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hepatitis" name="condition" value="hepatitis">
+                            <label for="hepatitis" style="margin-bottom: 0;">Hepatitis B/C</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="none" name="condition" value="none">
+                            <label for="none" style="margin-bottom: 0;"><strong>None of the above</strong></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Are you currently taking any medications? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="medicationYes" name="medication" value="yes">
+                            <label for="medicationYes" style="margin-bottom: 0;">Yes</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="medicationNo" name="medication" value="no">
+                            <label for="medicationNo" style="margin-bottom: 0;">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="medicationDetailsGroup" style="display: none;">
+                    <label>Please specify medications</label>
+                    <textarea id="medicationDetails" placeholder="List all medications you are currently taking"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Lifestyle Habits <span class="required">*</span></label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="smoking" name="habit" value="smoking">
+                            <label for="smoking" style="margin-bottom: 0;">Smoking</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="alcohol" name="habit" value="alcohol">
+                            <label for="alcohol" style="margin-bottom: 0;">Alcohol Consumption</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="drugs" name="habit" value="drugs">
+                            <label for="drugs" style="margin-bottom: 0;">Recreational Drug Use</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="noHabits" name="habit" value="none">
+                            <label for="noHabits" style="margin-bottom: 0;"><strong>None of the above</strong></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Have you donated blood in the last 3 months? <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="recentDonationYes" name="recentDonation" value="yes">
+                            <label for="recentDonationYes" style="margin-bottom: 0;">Yes</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="recentDonationNo" name="recentDonation" value="no">
+                            <label for="recentDonationNo" style="margin-bottom: 0;">No</label>
+                        </div>
+                    </div>
+                    <div class="error-message" id="recentDonationError">Please answer this question</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Additional Medical Information</label>
+                    <textarea id="additionalMedical" placeholder="Any other medical conditions, allergies, or information we should know about"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" onclick="prevStep(2)">← Back</button>
+                    <button type="button" class="btn-primary" onclick="nextStep(2)">Next: Upload Documents →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Document Upload -->
+            <div class="form-step" data-step="3">
+                <h2 style="margin-bottom: 25px; color: #333;">Document Upload</h2>
+                
+                <div class="info-box">
+                    <p><strong>Required Documents:</strong> Government-issued ID (Passport/Driver's License/National ID), Recent medical certificate, and Blood group certificate (if available).</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Government-issued ID <span class="required">*</span></label>
+                    <div class="upload-area" onclick="document.getElementById('govId').click()">
+                        <input type="file" id="govId" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" onchange="handleFileUpload(this, 'govIdList')">
+                        <p>📄 Click to upload or drag and drop</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">PDF, JPG, PNG (Max 5MB)</p>
+                    </div>
+                    <div class="file-list" id="govIdList"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Medical Certificate <span class="required">*</span></label>
+                    <div class="upload-area" onclick="document.getElementById('medCert').click()">
+                        <input type="file" id="medCert" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" onchange="handleFileUpload(this, 'medCertList')">
+                        <p>📄 Click to upload or drag and drop</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">PDF, JPG, PNG (Max 5MB)</p>
+                    </div>
+                    <div class="file-list" id="medCertList"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Blood Group Certificate (Optional)</label>
+                    <div class="upload-area" onclick="document.getElementById('bloodCert').click()">
+                        <input type="file" id="bloodCert" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" onchange="handleFileUpload(this, 'bloodCertList')">
+                        <p>📄 Click to upload or drag and drop</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">PDF, JPG, PNG (Max 5MB)</p>
+                    </div>
+                    <div class="file-list" id="bloodCertList"></div>
+                </div>
+
+                <div class="error-message" id="documentError">Please upload all required documents</div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" onclick="prevStep(3)">← Back</button>
+                    <button type="button" class="btn-primary" onclick="nextStep(3)">Verify Documents →</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Verification -->
+            <div class="form-step" data-step="4">
+                <h2 style="margin-bottom: 25px; color: #333;">Document Verification</h2>
+                
+                <div class="verification-panel">
+                    <h3>Automated Verification in Progress</h3>
+                    <p style="margin-bottom: 15px;">Our system is verifying your documents. This usually takes 10-30 seconds.</p>
+                    
+                    <div class="verification-status" id="verifyGovId">
+                        <div class="spinner"></div>
+                        <span>Verifying Government ID...</span>
+                    </div>
+                    
+                    <div class="verification-status" id="verifyMedCert">
+                        <div class="spinner"></div>
+                        <span>Verifying Medical Certificate...</span>
+                    </div>
+                    
+                    <div class="verification-status" id="verifyBloodCert" style="display: none;">
+                        <div class="spinner"></div>
+                        <span>Verifying Blood Group Certificate...</span>
+                    </div>
+
+                    <div class="verification-status" id="verifyInfo">
+                        <div class="spinner"></div>
+                        <span>Cross-checking information...</span>
+                    </div>
+                </div>
+
+                <div id="verificationResult" style="display: none;"></div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" onclick="prevStep(4)">← Back</button>
+                    <button type="button" class="btn-primary" id="proceedToPasswordBtn" style="display: none;" onclick="nextStep(4)">Set Password →</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Set Password -->
+            <div class="form-step" data-step="5">
+                <h2 style="margin-bottom: 25px; color: #333;">Create Your Account</h2>
+                
+                <div class="info-box" style="background: #d4edda; border-left-color: #4caf50;">
+                    <p style="color: #155724;"><strong>✓ Verification Successful!</strong> Your documents have been verified. Please create a password to complete your registration.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Create Password <span class="required">*</span></label>
+                    <input type="password" id="password" placeholder="Enter a strong password" required>
+                    <div class="error-message" id="passwordError">Password must be at least 8 characters with uppercase, lowercase, number, and special character</div>
+                    <div id="passwordStrength" style="margin-top: 5px; font-size: 13px;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password <span class="required">*</span></label>
+                    <input type="password" id="confirmPassword" placeholder="Re-enter your password" required>
+                    <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms" style="margin-bottom: 0;">
+                            I agree to the <a href="#" style="color: #e53935;">Terms and Conditions</a> and <a href="#" style="color: #e53935;">Privacy Policy</a> <span class="required">*</span>
+                        </label>
+                    </div>
+                    <div class="error-message" id="termsError">You must accept the terms and conditions</div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-primary" onclick="completeRegistration()">Complete Registration</button>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div class="form-step" data-step="6">
+                <div class="success-panel">
+                    <div class="checkmark">✓</div>
+                    <h2 style="color: #4caf50; margin-bottom: 15px;">Registration Successful!</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Your donor account has been created successfully.</p>
+                    <p style="color: #666; margin-bottom: 30px;">You will receive a confirmation email at <strong id="confirmEmail"></strong></p>
+                  <button type="button" class="btn-primary" onclick="window.location.href='Login.html'" style="background: #4caf50;">Login to Your Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let uploadedFiles = {
+            govId: null,
+            medCert: null,
+            bloodCert: null
+        };
+
+        // Medication toggle
+        document.getElementById('medicationYes').addEventListener('change', function() {
+            document.getElementById('medicationDetailsGroup').style.display = 'block';
+        });
+
+        document.getElementById('medicationNo').addEventListener('change', function() {
+            document.getElementById('medicationDetailsGroup').style.display = 'none';
+            document.getElementById('medicationDetails').value = '';
+        });
+
+        // None checkbox handlers
+        document.getElementById('none').addEventListener('change', function() {
+            if (this.checked) {
+                document.querySelectorAll('input[name="condition"]:not(#none)').forEach(cb => {
+                    cb.checked = false;
+                    cb.disabled = true;
+                });
+            } else {
+                document.querySelectorAll('input[name="condition"]:not(#none)').forEach(cb => {
+                    cb.disabled = false;
+                });
+            }
+        });
+
+        document.querySelectorAll('input[name="condition"]:not(#none)').forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('none').checked = false;
+                }
+            });
+        });
+
+        document.getElementById('noHabits').addEventListener('change', function() {
+            if (this.checked) {
+                document.querySelectorAll('input[name="habit"]:not(#noHabits)').forEach(cb => {
+                    cb.checked = false;
+                    cb.disabled = true;
+                });
+            } else {
+                document.querySelectorAll('input[name="habit"]:not(#noHabits)').forEach(cb => {
+                    cb.disabled = false;
+                });
+            }
+        });
+
+        document.querySelectorAll('input[name="habit"]:not(#noHabits)').forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('noHabits').checked = false;
+                }
+            });
+        });
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            const strengthText = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+            const strengthColor = ['#c62828', '#ef6c00', '#fbc02d', '#7cb342', '#2e7d32'];
+            
+            if (password.length > 0) {
+                strengthDiv.textContent = 'Strength: ' + strengthText[strength - 1];
+                strengthDiv.style.color = strengthColor[strength - 1];
+            } else {
+                strengthDiv.textContent = '';
+            }
+        });
+
+        // File upload handler
+        function handleFileUpload(input, listId) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must not exceed 5MB');
+                input.value = '';
+                return;
+            }
+
+            // Store the file
+            const fileType = input.id;
+            uploadedFiles[fileType] = file;
+
+            // Display file
+            const listDiv = document.getElementById(listId);
+            listDiv.innerHTML = `
+                <div class="file-item">
+                    <span>📎 ${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                    <span class="status verifying">Pending Verification</span>
+                </div>
+            `;
+        }
+
+        // Drag and drop support
+        document.querySelectorAll('.upload-area').forEach(area => {
+            area.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+
+            area.addEventListener('dragleave', function() {
+                this.classList.remove('dragover');
+            });
+
+            area.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                const input = this.querySelector('input[type="file"]');
+                input.files = e.dataTransfer.files;
+                input.dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Step navigation
+        function nextStep(step) {
+            if (!validateStep(step)) {
+                return;
+            }
+
+            currentStep = step + 1;
+            updateStepDisplay();
+
+            // Auto-start verification when reaching step 4
+            if (currentStep === 4) {
+                startVerification();
+            }
+        }
+
+        function prevStep(step) {
+            currentStep = step - 1;
+            updateStepDisplay();
+        }
+
+        function updateStepDisplay() {
+            // Update form steps
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+
+            // Update progress bar
+            document.querySelectorAll('.step').forEach(step => {
+                const stepNum = parseInt(step.dataset.step);
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Validation functions
+        function validateStep(step) {
+            let isValid = true;
+
+            if (step === 1) {
+                // Validate personal information
+                const fullName = document.getElementById('fullName');
+                const bloodGroup = document.getElementById('bloodGroup');
+                const phone = document.getElementById('phone');
+                const email = document.getElementById('email');
+                const address = document.getElementById('address');
+                const ward = document.getElementById('ward');
+                const dob = document.getElementById('dob');
+                const gender = document.querySelector('input[name="gender"]:checked');
+
+                isValid = validateField(fullName, 'fullNameError', fullName.value.trim().length >= 3) && isValid;
+                isValid = validateField(bloodGroup, 'bloodGroupError', bloodGroup.value !== '') && isValid;
+                isValid = validateField(phone, 'phoneError', phone.value.trim().length >= 10) && isValid;
+                isValid = validateField(email, 'emailError', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) && isValid;
+                isValid = validateField(address, 'addressError', address.value.trim().length >= 10) && isValid;
+                isValid = validateField(ward, 'wardError', ward.value.trim() !== '') && isValid;
+                isValid = validateField(dob, 'dobError', dob.value.trim() !== '') && isValid;
+                
+                if (!gender) {
+                    document.getElementById('genderError').classList.add('show');
+                    isValid = false;
+                } else {
+                    document.getElementById('genderError').classList.remove('show');
+                }
+            }
+
+            if (step === 2) {
+                // Validate medical information
+                const weight = document.getElementById('weight');
+                const height = document.getElementById('height');
+                const medication = document.querySelector('input[name="medication"]:checked');
+                const recentDonation = document.querySelector('input[name="recentDonation"]:checked');
+
+                isValid = validateField(weight, 'weightError', parseFloat(weight.value) >= 50) && isValid;
+                isValid = validateField(height, 'heightError', parseFloat(height.value) > 0) && isValid;
+                
+                if (!recentDonation) {
+                    document.getElementById('recentDonationError').classList.add('show');
+                    isValid = false;
+                } else {
+                    document.getElementById('recentDonationError').classList.remove('show');
+                }
+            }
+
+            if (step === 3) {
+                // Validate documents
+                if (!uploadedFiles.govId || !uploadedFiles.medCert) {
+                    document.getElementById('documentError').classList.add('show');
+                    isValid = false;
+                } else {
+                    document.getElementById('documentError').classList.remove('show');
+                }
+            }
+
+            return isValid;
+        }
+
+        function validateField(field, errorId, condition) {
+            const errorDiv = document.getElementById(errorId);
+            if (!condition) {
+                field.classList.add('error');
+                errorDiv.classList.add('show');
+                return false;
+            } else {
+                field.classList.remove('error');
+                errorDiv.classList.remove('show');
+                return true;
+            }
+        }
+
+        // Automated verification process
+        function startVerification() {
+            const checks = [
+                { id: 'verifyGovId', delay: 2000, message: '✓ Government ID verified successfully' },
+                { id: 'verifyMedCert', delay: 3500, message: '✓ Medical certificate verified successfully' },
+                { id: 'verifyInfo', delay: 5000, message: '✓ Information validated successfully' }
+            ];
+
+            // Show blood cert verification if uploaded
+            if (uploadedFiles.bloodCert) {
+                document.getElementById('verifyBloodCert').style.display = 'flex';
+                checks.splice(2, 0, { id: 'verifyBloodCert', delay: 4000, message: '✓ Blood Group certificate verified successfully' });
+            }
+
+            // Simulate verification process
+            checks.forEach((check, index) => {
+                setTimeout(() => {
+                    const statusDiv = document.getElementById(check.id);
+                    statusDiv.innerHTML = `<span style="color: #4caf50; font-size: 20px;">✓</span><span>${check.message}</span>`;
+                    
+                    // Update file status
+                    if (check.id === 'verifyGovId') {
+                        updateFileStatus('govIdList', 'verified');
+                    } else if (check.id === 'verifyMedCert') {
+                        updateFileStatus('medCertList', 'verified');
+                    } else if (check.id === 'verifyBloodCert') {
+                        updateFileStatus('bloodCertList', 'verified');
+                    }
+
+                    // Show success panel and enable next button when all complete
+                    if (index === checks.length - 1) {
+                        setTimeout(() => {
+                            document.getElementById('verificationResult').innerHTML = `
+                                <div style="background: #d4edda; border-left: 4px solid #4caf50; padding: 20px; margin: 20px 0; border-radius: 5px;">
+                                    <h3 style="color: #155724; margin-bottom: 10px;">All Checks Passed!</h3>
+                                    <p style="color: #155724;">Your documents and information have been successfully verified. You may now proceed to set your password.</p>
+                                </div>
+                            `;
+                            document.getElementById('verificationResult').style.display = 'block';
+                            document.getElementById('proceedToPasswordBtn').style.display = 'block';
+                        }, 500);
+                    }
+                }, check.delay);
+            });
+        }
+
+        function updateFileStatus(listId, status) {
+            const listDiv = document.getElementById(listId);
+            const statusSpan = listDiv.querySelector('.status');
+            if (statusSpan) {
+                statusSpan.className = `status ${status}`;
+                statusSpan.textContent = status === 'verified' ? '✓ Verified' : 'Verifying...';
+            }
+        }
+
+        // Complete registration
+        function completeRegistration() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const terms = document.getElementById('terms');
+
+            let isValid = true;
+
+            // Validate password strength
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            isValid = validateField(password, 'passwordError', passwordRegex.test(password.value)) && isValid;
+
+            // Validate password match
+            isValid = validateField(confirmPassword, 'confirmPasswordError', password.value === confirmPassword.value) && isValid;
+
+            // Validate terms
+            if (!terms.checked) {
+                document.getElementById('termsError').classList.add('show');
+                isValid = false;
+            } else {
+                document.getElementById('termsError').classList.remove('show');
+            }
+
+            if (!isValid) return;
+
+            // Save data (in real application, send to server)
+            const donorData = {
+                personalInfo: {
+                    fullName: document.getElementById('fullName').value,
+                    bloodGroup: document.getElementById('bloodGroup').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    address: document.getElementById('address').value,
+                    ward: document.getElementById('ward').value,
+                    dob: document.getElementById('dob').value,
+                    gender: document.querySelector('input[name="gender"]:checked').value
+                },
+                medicalInfo: {
+                    weight: document.getElementById('weight').value,
+                    height: document.getElementById('height').value,
+                    conditions: Array.from(document.querySelectorAll('input[name="condition"]:checked')).map(cb => cb.value),
+                    onMedication: document.querySelector('input[name="medication"]:checked').value,
+                    medications: document.getElementById('medicationDetails').value,
+                    habits: Array.from(document.querySelectorAll('input[name="habit"]:checked')).map(cb => cb.value),
+                    recentDonation: document.querySelector('input[name="recentDonation"]:checked').value,
+                    additionalInfo: document.getElementById('additionalMedical').value
+                },
+                documents: uploadedFiles,
+                password: password.value,
+                registrationDate: new Date().toISOString(),
+                verified: true
+            };
+
+            // Save to localStorage (in real app, send to server)
+            localStorage.setItem('donorData', JSON.stringify(donorData));
+
+            // Show success message
+            document.getElementById('confirmEmail').textContent = donorData.personalInfo.email;
+            currentStep = 6;
+            updateStepDisplay();
+
+            console.log('Donor registered successfully:', donorData);
+        }
+
+        // Initialize drag and drop for all upload areas
+        document.querySelectorAll('.upload-area').forEach(area => {
+            area.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.add('dragover');
+            });
+
+            area.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('dragover');
+            });
+
+            area.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('dragover');
+                
+                const inputId = this.querySelector('input[type="file"]').id;
+                const input = document.getElementById(inputId);
+                input.files = e.dataTransfer.files;
+                input.dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Form auto-save (optional)
+        function autoSave() {
+            const formData = {
+                step: currentStep,
+                personalInfo: {
+                    fullName: document.getElementById('fullName').value,
+                    bloodGroup: document.getElementById('bloodGroup').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    address: document.getElementById('address').value,
+                    ward: document.getElementById('ward').value,
+                    dob: document.getElementById('dob').value
+                }
+            };
+            sessionStorage.setItem('donorFormDraft', JSON.stringify(formData));
+        }
+
+        // Load auto-saved data on page load
+        window.addEventListener('load', function() {
+            const savedData = sessionStorage.getItem('donorFormDraft');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (confirm('We found a saved draft. Would you like to continue from where you left off?')) {
+                    Object.keys(data.personalInfo).forEach(key => {
+                        const element = document.getElementById(key);
+                        if (element) element.value = data.personalInfo[key];
+                    });
+                }
+            }
+        });
+
+        // Auto-save every 30 seconds
+        setInterval(autoSave, 30000);
+
+        // Prevent accidental page close
+        window.addEventListener('beforeunload', function(e) {
+            if (currentStep < 6) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+    </script>
+</body>
+</html>
